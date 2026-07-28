@@ -207,7 +207,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onSelectPlan,
               </div>
 
               <button
-                onClick={() => { onSelectPlan('Pro'); onStart(); }}
+                onClick={() => onSelectPlan('Pro')}
                 className="mt-8 w-full py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-teal-500/20"
               >
                 {lang === 'en' ? 'Choose Pro Plan' : 'Choisir la formule Pro'}
@@ -234,7 +234,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onSelectPlan,
               </div>
 
               <button
-                onClick={() => { onSelectPlan('Illimité'); onStart(); }}
+                onClick={() => onSelectPlan('Illimité')}
                 className="mt-8 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition"
               >
                 {lang === 'en' ? 'Choose Unlimited Plan' : 'Choisir l\'Illimité'}

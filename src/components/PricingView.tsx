@@ -6,12 +6,23 @@ import { CheckoutModal } from './CheckoutModal';
 interface PricingViewProps {
   user: UserProfile;
   onChangePlan: (formula: SubscriptionFormula) => Promise<void>;
+  initialFormula?: SubscriptionFormula | null;
 }
 
-export const PricingView: React.FC<PricingViewProps> = ({ user, onChangePlan }) => {
-  const [targetFormula, setTargetFormula] = useState<SubscriptionFormula>('Pro');
-  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+export const PricingView: React.FC<PricingViewProps> = ({ user, onChangePlan, initialFormula }) => {
+  const [targetFormula, setTargetFormula] = useState<SubscriptionFormula>(initialFormula || 'Pro');
+  const [showCheckoutModal, setShowCheckoutModal] = useState<boolean>(() => {
+    return !!(initialFormula && (initialFormula === 'Pro' || initialFormula === 'Illimité'));
+  });
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Sync initialFormula changes
+  React.useEffect(() => {
+    if (initialFormula && (initialFormula === 'Pro' || initialFormula === 'Illimité')) {
+      setTargetFormula(initialFormula);
+      setShowCheckoutModal(true);
+    }
+  }, [initialFormula]);
 
   const handlePlanClick = (formula: SubscriptionFormula) => {
     if (formula === user.formula) return;

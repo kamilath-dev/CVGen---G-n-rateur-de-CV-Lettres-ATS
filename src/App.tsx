@@ -37,6 +37,7 @@ export default function App() {
 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [selectedRecordForView, setSelectedRecordForView] = useState<GenerationRecord | null>(null);
+  const [selectedPricingPlan, setSelectedPricingPlan] = useState<SubscriptionFormula | null>('Pro');
 
   // Fetch initial profile from backend based on email
   useEffect(() => {
@@ -110,9 +111,13 @@ export default function App() {
     if (initialCV) {
       await handleUpdateCVSource(initialCV);
     }
-    await handleChangePlan(formula);
-
-    setCurrentView('generator');
+    
+    if (selectedPricingPlan && (selectedPricingPlan === 'Pro' || selectedPricingPlan === 'Illimité')) {
+      setCurrentView('pricing');
+    } else {
+      await handleChangePlan(formula);
+      setCurrentView('generator');
+    }
   };
 
   const handleLogout = () => {
@@ -148,11 +153,20 @@ export default function App() {
                 }
               }}
               onSelectPlan={(plan) => {
-                handleChangePlan(plan);
-                if (!isLoggedIn) {
-                  setIsAuthOpen(true);
+                setSelectedPricingPlan(plan);
+                if (plan === 'Pro' || plan === 'Illimité') {
+                  if (!isLoggedIn) {
+                    setIsAuthOpen(true);
+                  } else {
+                    setCurrentView('pricing');
+                  }
                 } else {
-                  setCurrentView('generator');
+                  handleChangePlan('Découverte');
+                  if (!isLoggedIn) {
+                    setIsAuthOpen(true);
+                  } else {
+                    setCurrentView('pricing');
+                  }
                 }
               }}
               user={user}
@@ -189,6 +203,7 @@ export default function App() {
             <PricingView
               user={user}
               onChangePlan={handleChangePlan}
+              initialFormula={selectedPricingPlan}
             />
           )}
 
