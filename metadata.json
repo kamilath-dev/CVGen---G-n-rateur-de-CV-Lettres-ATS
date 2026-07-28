@@ -1,0 +1,6 @@
+{
+  "name": "CVGen - Générateur de CV & Lettres ATS",
+  "description": "Générateur automatique de CV et lettres de motivation optimisés pour les ATS, avec score de compatibilité et traduction multilingue (FR/EN).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
