@@ -183,6 +183,62 @@ async function startServer() {
     res.json({ success: true, message: `Abonnement mis à jour vers la formule ${formula}.`, user });
   });
 
+  // Live Chat Support Assistant API (Gemini powered with fallback)
+  app.post('/api/support/chat', async (req: Request, res: Response) => {
+    const { message } = req.body;
+    const userQuery = message ? message.trim() : '';
+
+    if (!userQuery) {
+      res.status(400).json({ error: 'Message requis.' });
+      return;
+    }
+
+    try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (apiKey) {
+        const ai = new GoogleGenAI({ apiKey });
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: `Tu es l'assistant de support client bienveillant et expert en recrutement de "CVGen AI", un logiciel SaaS de génération de CV et lettres de motivation sur-mesure optimisés pour les systèmes ATS.
+Réponds de manière concise (2 à 4 phrases max), chaleureuse et très précise en français.
+Informations clés sur CVGen :
+- Score ATS : Analyse de 0 à 100% de l'adéquation entre l'offre d'emploi et le CV source.
+- Mon CV Source : C'est la base de données de l'utilisateur avec toutes ses vraies expériences.
+- Formules & Tarifs : Découverte (Gratuit, 3 CVs/mois), Pro (19€/mois, 20 CVs), Illimité (39€/mois).
+- Paiements acceptés : Carte Bancaire (Visa, MasterCard) et Mobile Money (MTN, Orange, Moov, Wave).
+- Sans engagement : Résiliation en un clic depuis l'espace abonnement.
+
+Question de l'utilisateur : "${userQuery}"`
+        });
+
+        if (response.text) {
+          res.json({ reply: response.text });
+          return;
+        }
+      }
+    } catch (e) {
+      console.error('Erreur Gemini Support Chat, basculement en mode réponse contextuelle:', e);
+    }
+
+    // Smart contextual fallback responses
+    const lowerQuery = userQuery.toLowerCase();
+    let reply = "Je suis votre assistant CVGen AI ! Comment puis-je vous guider dans votre candidature ?";
+
+    if (lowerQuery.includes('ats') || lowerQuery.includes('score')) {
+      reply = "Le score ATS (0 à 100%) évalue la correspondance de vos compétences avec les mots-clés de l'offre d'emploi. Plus votre score est élevé (80%+), plus votre CV passe facilement les filtres des logiciels de recrutement !";
+    } else if (lowerQuery.includes('paiement') || lowerQuery.includes('mobile money') || lowerQuery.includes('carte') || lowerQuery.includes('payer')) {
+      reply = "Nous acceptons la Carte Bancaire ainsi que le paiement Mobile Money (MTN, Orange, Moov et Wave). Les transactions sont 100% sécurisées avec délivrance immédiate de votre quota !";
+    } else if (lowerQuery.includes('cv source') || lowerQuery.includes('source')) {
+      reply = "La page 'Mon CV Source' est votre espace personnel où vous enregistrez l'ensemble de votre parcours réel. L'IA l'utilise comme référence unique pour adapter vos CV sans jamais inventer d'expériences !";
+    } else if (lowerQuery.includes('résilier') || lowerQuery.includes('annuler') || lowerQuery.includes('désabonner')) {
+      reply = "Tous nos abonnements Pro et Illimité sont sans engagement ! Vous pouvez changer de formule ou résilier à tout moment directement sur la page Tarifs & Abonnements.";
+    } else if (lowerQuery.includes('créer') || lowerQuery.includes('générer') || lowerQuery.includes('comment')) {
+      reply = "C'est très simple ! Cliquez sur 'Générer un CV', collez le texte ou l'URL de l'offre d'emploi, et notre IA adaptera votre CV et votre lettre de motivation en quelques secondes.";
+    }
+
+    res.json({ reply });
+  });
+
   // URL Scraper / Job Offer Extraction
   app.post('/api/scrape-job', async (req: Request, res: Response) => {
     const { url, rawText } = req.body;

@@ -9,6 +9,7 @@ import { ProfileView } from './components/ProfileView';
 import { PricingView } from './components/PricingView';
 import { AdminView } from './components/AdminView';
 import { AuthModal } from './components/AuthModal';
+import { LiveChatWidget } from './components/LiveChatWidget';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<string>('landing');
@@ -225,6 +226,9 @@ export default function App() {
         onLoginSuccess={handleLoginSuccess}
         user={user}
       />
+
+      {/* Floating Live Chat Support Widget */}
+      <LiveChatWidget />
     </div>
   );
 }
