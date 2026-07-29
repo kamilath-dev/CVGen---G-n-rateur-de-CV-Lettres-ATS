@@ -7,9 +7,10 @@ interface PricingViewProps {
   user: UserProfile;
   onChangePlan: (formula: SubscriptionFormula) => Promise<void>;
   initialFormula?: SubscriptionFormula | null;
+  onPaymentCompleted?: () => void;
 }
 
-export const PricingView: React.FC<PricingViewProps> = ({ user, onChangePlan, initialFormula }) => {
+export const PricingView: React.FC<PricingViewProps> = ({ user, onChangePlan, initialFormula, onPaymentCompleted }) => {
   const [targetFormula, setTargetFormula] = useState<SubscriptionFormula>(initialFormula || 'Pro');
   const [showCheckoutModal, setShowCheckoutModal] = useState<boolean>(() => {
     return !!(initialFormula && (initialFormula === 'Pro' || initialFormula === 'Illimité'));
@@ -40,6 +41,9 @@ export const PricingView: React.FC<PricingViewProps> = ({ user, onChangePlan, in
     setIsUpdating(true);
     try {
       await onChangePlan(formula);
+      if (onPaymentCompleted) {
+        onPaymentCompleted();
+      }
     } catch (e) {
       console.error(e);
     } finally {

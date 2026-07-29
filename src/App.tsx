@@ -31,8 +31,8 @@ export default function App() {
     remainingQuota: 18,
     subscriptionStatus: 'Actif',
     registrationDate: new Date().toISOString().split('T')[0],
-    sourceCVText: `${savedEmail.split('@')[0].toUpperCase().replace(/[0-9_.-]+/g, ' ')}\n${savedEmail} | +33 6 12 34 56 78 | Paris, France\n\nPROFIL PROFESSIONNEL\nProfessionnel(le) diplômé(e) et motivé(e) à la recherche d'opportunités à fort impact.\n\nEXPÉRIENCES PROFESSIONNELLES\n- Spécialiste & Chargé de Projets Senior (2022 - Présent)\n  * Direction et exécution de projets stratégiques avec respect des objectifs et des délais.\n- Consultant Web & Digital (2019 - 2022)\n  * Conception, développement et accompagnement de clients.\n\nFORMATIONS & DIPLÔMES\n- Master / Diplôme Supérieur — Université (2019)\n\nCOMPÉTENCES\n- Gestion de projet, Outils Web/Digital, Rigueur, Agilité, Français, Anglais`,
-    sourceCVFileName: `CV_Source_${savedEmail.split('@')[0]}.txt`,
+    sourceCVText: '',
+    sourceCVFileName: '',
     stripeCustomerId: `cus_${savedEmail.split('@')[0]}`
   });
 
@@ -113,10 +113,12 @@ export default function App() {
       await handleUpdateCVSource(initialCV);
     }
     
-    if (selectedPricingPlan && (selectedPricingPlan === 'Pro' || selectedPricingPlan === 'Illimité')) {
+    setSelectedPricingPlan(formula);
+
+    if (formula === 'Pro' || formula === 'Illimité') {
       setCurrentView('pricing');
     } else {
-      await handleChangePlan(formula);
+      await handleChangePlan('Découverte');
       setCurrentView('generator');
     }
   };
@@ -205,6 +207,7 @@ export default function App() {
               user={user}
               onChangePlan={handleChangePlan}
               initialFormula={selectedPricingPlan}
+              onPaymentCompleted={() => setCurrentView('generator')}
             />
           )}
 
@@ -225,6 +228,7 @@ export default function App() {
         onClose={() => setIsAuthOpen(false)}
         onLoginSuccess={handleLoginSuccess}
         user={user}
+        initialFormula={selectedPricingPlan}
       />
 
       {/* Floating Live Chat Support Widget */}

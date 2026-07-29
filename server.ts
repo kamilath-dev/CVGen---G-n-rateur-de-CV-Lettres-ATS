@@ -55,8 +55,8 @@ COMPÉTENCES & OUTILS
       remainingQuota: 18,
       subscriptionStatus: 'Actif',
       registrationDate: new Date().toISOString().split('T')[0],
-      sourceCVText: defaultPersonalCV,
-      sourceCVFileName: `CV_Source_${emailPrefix}.txt`,
+      sourceCVText: requestedCVText || '',
+      sourceCVFileName: requestedCVText ? `CV_Source_${emailPrefix}.txt` : '',
       stripeCustomerId: `cus_${id}`
     };
 
